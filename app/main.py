@@ -9,7 +9,7 @@ from app.database import Base, engine, get_db
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="FastAPI Calculator - Module 9")
+app = FastAPI(title="FastAPI Calculator - Module 12")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -18,7 +18,7 @@ def read_root():
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FastAPI Calculator - Module 9</title>
+    <title>FastAPI Calculator - Module 12</title>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -72,7 +72,7 @@ def read_root():
 <body>
     <div class="container">
         <h1>FastAPI Calculator</h1>
-        <p style="text-align: center; color: #666;">Module 9: Docker + PostgreSQL</p>
+        <p style="text-align: center; color: #666;">Module 12: Docker + PostgreSQL</p>
         <div>
             <input type="number" id="a" placeholder="First Number" step="any">
             <input type="number" id="b" placeholder="Second Number" step="any">

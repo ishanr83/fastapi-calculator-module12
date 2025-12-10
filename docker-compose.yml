@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15
-    container_name: postgres_module9
+    container_name: postgres_module12
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -20,38 +18,33 @@ services:
       timeout: 5s
       retries: 5
 
+  fastapi:
+    build: .
+    container_name: fastapi_module12
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/fastapi_db
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app_network
+
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: pgadmin_module9
+    container_name: pgadmin_module12
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
       - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - app_network
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - app_network
-    depends_on:
-      db:
-        condition: service_healthy
-
-  fastapi:
-    build: .
-    container_name: fastapi_module9
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/fastapi_db
-    volumes:
-      - .:/app
-    networks:
-      - app_network
-    depends_on:
-      db:
-        condition: service_healthy
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
   postgres_data:

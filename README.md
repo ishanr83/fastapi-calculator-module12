@@ -1,198 +1,167 @@
-# Module 9: FastAPI Calculator with Docker and PostgreSQL
+# FastAPI Calculator - Module 12
 
-## Project Overview
-This project demonstrates:
-- Docker containerization with Docker Compose
-- FastAPI web application
-- PostgreSQL database integration
-- Database relationships (one-to-many with foreign keys)
-- Complete CRUD operations via SQL
+A production-ready FastAPI application with PostgreSQL database, user authentication, and calculation management.
 
-## Architecture
-- FastAPI: Web framework serving calculator API and UI
-- PostgreSQL: Relational database storing users and calculations
-- pgAdmin: Web-based database management interface
-- Docker Compose: Orchestrates all services
+## Features
+
+- User registration and authentication
+- BREAD operations for calculations (Browse, Read, Edit, Add, Delete)
+- PostgreSQL database with SQLAlchemy ORM
+- Comprehensive test suite with 90%+ coverage
+- Docker containerization
+- CI/CD with GitHub Actions
+- Automatic Docker Hub deployment
 
 ## Quick Start
 
 ### Prerequisites
-- Docker Desktop installed and running
-- Git installed
 
-### Setup and Run
+- Docker and Docker Compose
+- Git
 
-1. Clone the repository:
+### Run the Application
+```bash
+# Clone the repository
+git clone https://github.com/ishanr83/fastapi-calculator-module12.git
+cd fastapi-calculator-module12
 
-   git clone https://github.com/YOUR_USERNAME/fastapi-calculator-module9.git
-   cd fastapi-calculator-module9
+# Start all services
+docker-compose up --build -d
 
-2. Start all services:
+# Access the application
+# API: http://localhost:8000
+# Swagger Docs: http://localhost:8000/docs
+# pgAdmin: http://localhost:5050
+```
 
+## Running Tests
+
+### Local Testing with Docker
+
+1. Start all services:
+```bash
    docker-compose up --build -d
+```
 
-3. Access the applications:
-   - FastAPI Calculator: http://localhost:8000
-   - pgAdmin: http://localhost:5050
-     - Email: admin@admin.com
-     - Password: admin
+2. Run tests inside the container:
+```bash
+   docker-compose exec fastapi pytest --maxfail=1 --disable-warnings --cov=app --cov-report=term-missing
+```
 
-4. Stop services:
+3. View test coverage results in the output (90%+ coverage).
 
-   docker-compose down
+### Manual API Testing
 
-## Database Setup
+1. Open Swagger UI: http://localhost:8000/docs
 
-### Connect pgAdmin to PostgreSQL
+2. Test the following workflow:
+   - Register a user (POST /users/register)
+   - Login with that user (POST /users/login)
+   - Create a calculation (POST /calculations) - use user_id from registration
+   - List all calculations (GET /calculations)
+   - Update a calculation (PUT /calculations/{id})
+   - Delete a calculation (DELETE /calculations/{id})
 
-1. Open pgAdmin at:  
-   http://localhost:5050
-
-2. Login with credentials above
-
-3. Right-click "Servers" → "Register" → "Server"
-
-4. General tab:
-   - Name: FastAPI DB
-
-5. Connection tab:
-   - Host: db
-   - Port: 5432
-   - Database: fastapi_db
-   - Username: postgres
-   - Password: postgres
-   - Save password: checked
-
-6. Click "Save"
-
-### Run SQL Operations
-
-1. Open Query Tool:  
-   Right-click "fastapi_db" → "Query Tool"
-
-2. Open file:
-   sql_scripts/module9_operations.sql
-
-3. Run each section separately
-
-4. Take screenshots for documentation
-
-## Database Schema
-
-### Users Table
-
-users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-
-### Calculations Table
-
-calculations (
-    id SERIAL PRIMARY KEY,
-    operation VARCHAR(20) NOT NULL,
-    operand_a FLOAT NOT NULL,
-    operand_b FLOAT NOT NULL,
-    result FLOAT NOT NULL,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
-)
-
-Relationship: One user can have many calculations (one-to-many)
-
-## Required Screenshots
-
-1. CREATE TABLES - Table creation success  
-2. INSERT RECORDS - Insert success messages  
-3. SELECT USERS - All users displayed  
-4. SELECT CALCULATIONS - All calculations displayed  
-5. JOIN QUERY - Joined data with usernames  
-6. UPDATE RECORD - Updated result value  
-7. DELETE RECORD - Fewer records after deletion  
-8. DOCKER STATUS - All containers running (output of: docker-compose ps)
-
-## Learning Outcomes
-
-- Applied containerization with Docker Compose
-- Integrated Python FastAPI with PostgreSQL
-- Demonstrated one-to-many relationships with foreign keys
-- Performed complete CRUD operations in SQL
+## Project Structure
+```
+fastapi-calculator-module12/
+├── app/
+│   ├── __init__.py
+│   ├── main.py           # FastAPI app with all endpoints
+│   ├── operations.py     # Calculator operations
+│   ├── models.py         # SQLAlchemy models
+│   ├── schemas.py        # Pydantic schemas
+│   ├── auth.py           # Password hashing utilities
+│   └── database.py       # Database configuration
+├── tests/
+│   ├── test_calculations.py  # Calculation endpoint tests
+│   ├── test_users.py         # User endpoint tests
+│   ├── test_api_endpoints.py # API endpoint tests
+│   └── test_operations.py    # Operation function tests
+├── .github/
+│   └── workflows/
+│       └── ci.yml        # GitHub Actions CI/CD
+├── docker-compose.yml    # Multi-container setup
+├── Dockerfile            # FastAPI container
+└── requirements.txt      # Python dependencies
+```
 
 ## Technologies Used
 
-- Python 3.12
-- FastAPI 0.104.1
-- PostgreSQL 15
-- pgAdmin 4
-- Docker and Docker Compose
-- SQLAlchemy 2.0
+- **FastAPI**: Modern web framework for building APIs
+- **PostgreSQL**: Relational database
+- **SQLAlchemy**: ORM for database operations
+- **Pydantic**: Data validation using Python type hints
+- **Pytest**: Testing framework with 90%+ coverage
+- **Docker**: Containerization
+- **GitHub Actions**: CI/CD pipeline
+- **pgAdmin**: Database management tool
 
-## Project Structure
+## CI/CD Pipeline
 
-fastapi-calculator-module9  
-├── app  
-│   ├── __init__.py  
-│   ├── main.py  
-│   └── operations.py  
-├── sql_scripts  
-│   └── module9_operations.sql  
-├── tests  
-│   └── __init__.py  
-├── docker-compose.yml  
-├── Dockerfile  
-├── requirements.txt  
-├── .gitignore  
-└── README.md  
+Every push to `main` triggers:
+1. PostgreSQL service starts
+2. Dependencies install
+3. All tests run with coverage report (90%+)
+4. Docker image builds
+5. Image pushes to Docker Hub (on success)
 
-## Troubleshooting
+View workflow: https://github.com/ishanr83/fastapi-calculator-module12/actions
 
-### Ports Already in Use
+## Docker Hub
 
-- Stop current containers:
+Docker image: https://hub.docker.com/r/ishanr83/fastapi-calculator-module12
 
-  docker-compose down
+## API Documentation
 
-- Restart:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
-  docker-compose up -d
+## Endpoints
 
-If needed, edit "docker-compose.yml" and change ports for:
-- FastAPI (8000)
-- PostgreSQL (5432)
-- pgAdmin (5050)
+### Calculator UI
+- `GET /` - Interactive calculator interface
 
-### Cannot Connect to Database
+### Calculator API
+- `GET /api/add?a={a}&b={b}` - Add two numbers
+- `GET /api/subtract?a={a}&b={b}` - Subtract two numbers
+- `GET /api/multiply?a={a}&b={b}` - Multiply two numbers
+- `GET /api/divide?a={a}&b={b}` - Divide two numbers
 
-- Verify host is "db" (not "localhost") in pgAdmin
-- Check containers:
+### User Management
+- `POST /users/register` - Register a new user
+- `POST /users/login` - Login and verify credentials
 
-  docker-compose ps
+### Calculations (BREAD)
+- `GET /calculations` - Browse all calculations
+- `GET /calculations/{id}` - Read a specific calculation
+- `POST /calculations` - Add a new calculation
+- `PUT /calculations/{id}` - Edit an existing calculation
+- `DELETE /calculations/{id}` - Delete a calculation
 
-- View database logs:
+## Environment Variables
 
-  docker-compose logs db
+- `DATABASE_URL`: PostgreSQL connection string (default: `postgresql://postgres:postgres@db:5432/fastapi_db`)
 
-### Reset Everything
+## Development
+```bash
+# Install dependencies locally (optional)
+pip install -r requirements.txt
 
-- Remove containers and volumes:
+# Run tests locally (requires PostgreSQL)
+pytest --cov=app
 
-  docker-compose down -v
+# Stop all services
+docker-compose down
 
-- Rebuild and start:
+# Remove all data
+docker-compose down -v
+```
 
-  docker-compose up --build -d
+## License
+
+MIT
 
 ## Author
 
-Your Name - IS 218 Module 9 Assignment
-
-## Date
-
-November 2024
-
-## Repository
-
-https://github.com/YOUR_USERNAME/fastapi-calculator-module9
-
+Ishan Ranade
