@@ -73,3 +73,67 @@ def test_login_invalid_password():
         },
     )
     assert response.status_code == 401
+
+
+def test_duplicate_email():
+    """Test registering with duplicate email"""
+    clear_db()
+
+    response = client.post(
+        "/users/register",
+        json={
+            "email": "duplicate@example.com",
+            "username": "user1",
+            "password": "password123",
+        },
+    )
+    assert response.status_code == 201
+
+    response = client.post(
+        "/users/register",
+        json={
+            "email": "duplicate@example.com",
+            "username": "user2",
+            "password": "password123",
+        },
+    )
+    assert response.status_code == 400
+
+
+def test_duplicate_username():
+    """Test registering with duplicate username"""
+    clear_db()
+
+    response = client.post(
+        "/users/register",
+        json={
+            "email": "user1@example.com",
+            "username": "sameusername",
+            "password": "password123",
+        },
+    )
+    assert response.status_code == 201
+
+    response = client.post(
+        "/users/register",
+        json={
+            "email": "user2@example.com",
+            "username": "sameusername",
+            "password": "password123",
+        },
+    )
+    assert response.status_code == 400
+
+
+def test_login_nonexistent_user():
+    """Test login with non-existent email"""
+    clear_db()
+
+    response = client.post(
+        "/users/login",
+        json={
+            "email": "nonexistent@example.com",
+            "password": "password123",
+        },
+    )
+    assert response.status_code == 401
