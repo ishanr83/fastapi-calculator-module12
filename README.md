@@ -158,10 +158,3 @@ docker-compose down
 docker-compose down -v
 ```
 
-## License
-
-MIT
-
-## Author
-
-Ishan Ranade
